@@ -38,11 +38,13 @@ project TKATs is
 
    end Compiler;
 
+   SDKROOT := External ("SDKROOT", "");
+
    package Linker is
       case Host_OS is
          when "Darwin" =>
             --  Deal with unusual linker on macOS/Darwin
-            for Default_Switches ("Ada") use Coverage_Checks_Switches & ("-Wl,-ld_classic");
+            for Default_Switches ("Ada") use Coverage_Checks_Switches & ("-L" & SDKROOT & "/usr/lib");
          when others =>
             for Default_Switches ("Ada") use Coverage_Checks_Switches;
       end case;
