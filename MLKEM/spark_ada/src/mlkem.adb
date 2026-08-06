@@ -1304,6 +1304,10 @@ is
    function XOF_Then_SampleNTT (B : in Bytes_34) return NTT_Poly_Zq
      with No_Inline
    is
+      --  Loop variant _will_ fail if checked dynamically at run-time,
+      --  (e.g. in Debug builds), so disable it here.
+      pragma Assertion_Policy (Loop_Variant => Disable);
+
       Ctx : SHAKE128.Context;
       J2  : Natural := 0;
       A   : NTT_Poly_Zq := (others => 0); --  calls _memset()
