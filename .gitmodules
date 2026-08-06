@@ -1,0 +1,6 @@
+[submodule "libkeccak"]
+	path = libkeccak
+	url = https://github.com/damaki/libkeccak.git
+[submodule "MLKEM/KAT"]
+	path = MLKEM/KAT
+	url = https://github.com/post-quantum-cryptography/KAT.git
