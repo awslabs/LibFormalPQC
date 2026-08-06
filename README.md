@@ -1,19 +1,26 @@
-# LibMLKEM - A new, formal reference implementation of FIPS 203 ML-KEM
+# LibFormalPQC - Formal reference implementations of PQC algorithms
 
-This library presents a new reference implementation of
-FIPS 203 ML-KEM (the algorithm formerly known as Kyber),
-as specified in the 13th August 2024 issue of FIPS 203.
+This library presents new reference implementation of
+the NIST PQC algorithms.
+
+This reposistory started out as "LibMLKEM" with an implementation of
+ML-KEM in SPARK/Ada, which was later joined by some
+experimental implementations of the ML-KEM NTT in Rust
+and verified with the Verus tool.
+
+The repository has now been renamed to "LibFormalPQC"
+to allow for the addition of other algorithms.
 
 The goals of producing these implementations are:
 
-* To act as a vehicle for detailed review of FIPS 203.
+* To act as a vehicle for detailed review of the FIPS standards.
 
 * To produce a reference implementation of ML-KEM which is
 completely independent of all other known implementations of Kyber.
 
 * To test the capability of contemporary formal languages and verification
 tools, such as [SPARK](https://www.adacore.com/sparkpro),
-[CBMC](https://diffblue.github.io/cbmc/) and [Kani](https://github.com/model-checking/kani),
+[CBMC](https://diffblue.github.io/cbmc/) and [Verus](https://verus-lang.github.io/verus/guide/),
 and to act as a challenge problem for those languages and tools.
 
 * To act as a set of verification challenges for the underlying SMT provers, in particular CVC5.
@@ -43,8 +50,8 @@ SPARK Pro toolset. The SPARK implementation meets all of the
 verification goals stated above, ands also provides static verification
 of worst-case stack usage, and structural coverage analysis of the KATs.
 
-See the README file in the `spark_ada` subdirectory for more
+See the README file in the `MLKEM/spark_ada` subdirectory for more
 information.
 
-Additional implementations and verification using other languages and
-tools such  Dafny, CBMC (for C) and Kani (for Rust) may follow.
+Some efforts to reproduce the verification of the ML-KEM NTT in Rust
+lie in the `MLKEM/rust` subdirectory.
