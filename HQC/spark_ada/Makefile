@@ -12,13 +12,13 @@ hqc-5-binaries: obj5/test_intermediates obj5/test_kat
 proofall: proof1 proof3 proof5
 
 proof1: src/*.ads src/*.adb hqc.gpr
-	gnatprove -Phqc -XHQC_PARAM=1 --report=fail -u src/hqc.adb
+	gnatprove -Phqc -XHQC_PARAM=1 --report=statistics -u src/hqc.adb
 
 proof3: src/*.ads src/*.adb hqc.gpr
-	gnatprove -Phqc -XHQC_PARAM=3 --report=fail -u src/hqc.adb
+	gnatprove -Phqc -XHQC_PARAM=3 --report=statistics -u src/hqc.adb
 
 proof5: src/*.ads src/*.adb hqc.gpr
-	gnatprove -Phqc -XHQC_PARAM=5 --report=fail -u src/hqc.adb
+	gnatprove -Phqc -XHQC_PARAM=5 --report=statistics -u src/hqc.adb
 
 
 # Switches for debug release
