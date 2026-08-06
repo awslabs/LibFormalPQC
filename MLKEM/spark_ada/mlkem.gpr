@@ -1,7 +1,7 @@
 --  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 --  SPDX-License-Identifier: Apache-2.0
 
-with "libkeccak/libkeccak.gpr";
+with "../../libkeccak/libkeccak.gpr";
 library project MLKEM is
 
    for Library_Name use "mlkem";
