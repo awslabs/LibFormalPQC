@@ -1,4 +1,4 @@
-# hqc-1
+# HQC-1
 
 count = 0
 seed = 9ef877fddbe8891c6e4e79eaf022e563defaca6b152161b9a423e8fe96a403e774b2d352cf74c934069c9de74757f505

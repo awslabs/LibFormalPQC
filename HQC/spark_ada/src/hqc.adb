@@ -1275,7 +1275,7 @@ is
             Index := Error_Index (Param.GF_MUL_ORDER - GF.Log (Index_256 (GSums (I))));
             Error (Index) := Error (Index) xor 1 xor U8 (Shift_Right (-W (I), 15));
 
-            Index := Error_Index ((Param.GF_MUL_ORDER - GF.Log (Index_256 (GSums (I)))) xor 1);
+            Index := Error_Index (Param.GF_MUL_ORDER - GF.Log (Index_256 (GSums (I) xor 1)));
             Error (Index) := Error (Index) xor 1 xor U8 (Shift_Right (-W (K + I), 15));
          end loop;
       end Retrieve_Error_Poly;
