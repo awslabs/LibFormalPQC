@@ -11,6 +11,7 @@ hqc-5-binaries: obj5/test_intermediates obj5/test_kat
 # TARGETs for GNATProve proof runs
 proofall: proof1 proof3 proof5
 
+# Verbose output with --report=statistics
 proof1: src/*.ads src/*.adb hqc.gpr
 	gnatprove -Phqc -XHQC_PARAM=1 --report=statistics -u src/hqc.adb
 
@@ -19,6 +20,16 @@ proof3: src/*.ads src/*.adb hqc.gpr
 
 proof5: src/*.ads src/*.adb hqc.gpr
 	gnatprove -Phqc -XHQC_PARAM=5 --report=statistics -u src/hqc.adb
+
+# Verbose output with --report=fail
+proof1q: src/*.ads src/*.adb hqc.gpr
+	gnatprove -Phqc -XHQC_PARAM=1 --report=fail -u src/hqc.adb
+
+proof3q: src/*.ads src/*.adb hqc.gpr
+	gnatprove -Phqc -XHQC_PARAM=3 --report=fail -u src/hqc.adb
+
+proof5q: src/*.ads src/*.adb hqc.gpr
+	gnatprove -Phqc -XHQC_PARAM=5 --report=fail -u src/hqc.adb
 
 
 # Switches for debug release
