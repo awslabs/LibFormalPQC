@@ -1409,7 +1409,7 @@ is
       begin
          Sigma       := Sigma_Table'(1, others => 0);
          Sigma_Copy  := Sigma_Table'(others => 0);
-         X_Sigma_P   := Sigma_Table'(0, others => 1);
+         X_Sigma_P   := Sigma_Table'(0, 1, others => 0);
          Deg_Sigma_P := 0;
          Deg_Sigma   := 0;
          D           := Syndromes (0);
