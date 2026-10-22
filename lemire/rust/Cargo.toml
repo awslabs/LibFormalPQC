@@ -1,0 +1,15 @@
+[package]
+name = "lemire"
+version = "0.1.0"
+edition = "2021"
+description = "Lemire's fair bounded random integer algorithm, verified with Verus"
+
+[dependencies]
+# Must match the installed Verus release (0.2026.10.18.7d82994).
+vstd = "=0.0.0-2026-10-18-0147"
+
+[package.metadata.verus]
+verify = true
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(verus_keep_ghost)', 'cfg(verus_only)'] }
