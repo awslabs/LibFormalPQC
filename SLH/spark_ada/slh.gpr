@@ -157,7 +157,7 @@ library project SLH is
 
    package Prove is
       for Proof_Switches ("Ada") use ("--proof=per_path",
-                                      "-j8",
+                                      "-j0",
                                       "--no-global-generation",
                                       "--no-inlining",
                                       "--no-loop-unrolling",
@@ -166,6 +166,7 @@ library project SLH is
                                       "--timeout=4",
                                       "--memlimit=0",
                                       "--steps=25000",
+                                      "--output=oneline",
                                       "--report=statistics");
    end Prove;
 
