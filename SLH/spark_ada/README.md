@@ -16,6 +16,10 @@ If the reader is not familiar with SPARK, then [start here](https://learn.adacor
 This implementation is absolutely NOT intended for production or any use
 in a "high assurance" setting. In particular:
 
+* ONE function (SLH.Hash.PRF_Msg) was implemented by human hands. *Everything* else,
+including all test scripts, contracts and proofs, were generated from the FIPS-205 document
+by Claude Opus 5.5 in a single kiro-cli session.
+
 * Constant-time behaviour is not verified, at the level of either the source
 code or the generated code.
 
