@@ -127,7 +127,8 @@ library project SLH is
    case Runtime_Mode is
       when "zfp" =>
          for Runtime ("Ada") use "zfp";
-         for Excluded_Source_Files use ("slh-debug.ads", "slh-debug.adb");
+         for Excluded_Source_Files use ("slh-debug.ads", "slh-debug.adb",
+                                        "slh-kat.ads", "slh-kat.adb");
       when others =>
          null;
    end case;

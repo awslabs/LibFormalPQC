@@ -14,9 +14,14 @@ pragma Restriction_Warnings (No_Implicit_Dynamic_Code);
 pragma Restriction_Warnings (No_Implicit_Heap_Allocations);
 pragma Restriction_Warnings (No_Implicit_Protected_Object_Allocations);
 pragma Restriction_Warnings (No_Implicit_Task_Allocations);
-pragma Restriction_Warnings (No_Recursion);
+--  No_Recursion is not used, since the ghost function
+--  SLH.WOTS.Chain_Spec and the ghost lemma
+--  SLH.WOTS.Lemma_Chain_Compose are recursive
 pragma Restriction_Warnings (No_Relative_Delay);
 pragma Restriction_Warnings (No_Elaboration_Code);
-pragma Restriction_Warnings (No_Secondary_Stack);
+--  No_Secondary_Stack is not used, since the ghost functions
+--  SLH.Pure_Message and SLH.Pre_Hash_Message return unconstrained
+--  arrays. Only contracts and ghost code call them, so the secondary
+--  stack is only used when contracts are enabled
 
 --  Compilation unit restrictions
