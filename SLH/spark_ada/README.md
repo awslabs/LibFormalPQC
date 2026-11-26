@@ -260,7 +260,8 @@ make CONTRACTS=enabled
 ```
 
 which takes much longer: the XMSS tests alone take about six minutes.
-Run `make clean` again before going back to the default.
+The Makefile rebuilds the library whenever its compiler switches change,
+so `make` on its own goes back to the default.
 
 The `tkats` program can also be run directly, as `tkats hash`, `tkats wots`,
 `tkats xmss`, `tkats ht`, `tkats fors` or `tkats slh`, which write test
