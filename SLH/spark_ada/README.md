@@ -247,7 +247,8 @@ Each group can also be run on its own:
 | `make check_slh` | Section 9, internal functions | `check_slh_kats.py` |
 | `make check_acvp` | NIST ACVP vectors, sections 9 and 10 | `check_acvp.py` |
 
-`make clean` removes the test program and all results.
+`make clean` removes the test and benchmark programs, all results, and
+the objects of the library and LibKeccak.
 
 By default, the tests build the library without run-time checks of
 contracts and assertions, but with all other run-time checks (overflow,
@@ -291,6 +292,54 @@ export SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk
 
 Warnings from `ld` that object files were "built for newer 'macOS' version"
 are harmless.
+
+## Running the benchmarks
+
+```
+cd SLH/spark_ada/tests
+make bench
+```
+
+builds the benchmark program `tbench` (in `tests/tbench.adb`) once for
+each build variant of the library, runs each one, and prints a summary of
+the median CPU cycles for `SLH_Keygen`, `SLH_Sign` and `SLH_Verify`. The
+summary is also written to `tests/bench/summary.txt`, and the results of
+each variant to `tests/bench/VARIANT.txt`.
+
+The variants are every combination of these `slh.gpr` scenario variables:
+
+| Variable | Values (Makefile variable to change them) |
+|----------|--------|
+| `SLH_BUILD_MODE` | `debug`, `Og`, `O1`, `O2`, `O3`, `Os` (`BENCH_MODES`) |
+| `SLH_RUNTIME_CHECKS` | `enabled`, `disabled` (`BENCH_RUNTIME_CHECKS`) |
+| `SLH_CONTRACTS` | `disabled` (`BENCH_CONTRACTS`) |
+
+The `profile` build mode is left out, since it is `O2` with debug
+information. Contract checks are left out by default, because the
+postconditions recompute whole trees: at `O2`, one `SLH_Keygen` takes
+about 90 seconds with them, and one `SLH_Sign` more than 7 minutes. To
+include them anyway, use
+`make bench BENCH_CONTRACTS="enabled disabled" BENCH_ITER="1 1 1"`. LibKeccak is always built optimized and without run-time
+checks, so only the SLH code differs between variants.
+
+Each operation is run once to warm up, then timed 10 times for keygen and
+sign and 50 times for verify. Set `BENCH_ITER` to change these, for
+example `make bench BENCH_ITER="3 3 20"`. Every signature is checked with
+`SLH_Verify` outside the timed region. For example, to benchmark only the
+optimized builds without contract checks:
+
+```
+make bench BENCH_MODES="O2 O3" BENCH_CONTRACTS=disabled
+```
+
+The cycle counter is the one from mlkem-native, in `SLH/hal` (see
+`SLH/hal/README.md`). On macOS it uses Apple's private `kperf` framework,
+which only works as root, so `make bench` runs each benchmark with
+`sudo`, which may ask for your password. On Linux it uses
+`perf_event_open` and needs no `sudo`, but
+`/proc/sys/kernel/perf_event_paranoid` must be 2 or less. If the counter
+doesn't work, `tbench` stops with an error message instead of reporting
+results.
 
 ## Reproducing the proofs
 

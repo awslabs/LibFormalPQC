@@ -1,0 +1,40 @@
+--  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+--  SPDX-License-Identifier: Apache-2.0
+
+--  The benchmark program tbench, for one build variant of the library.
+--  The variant is chosen with the scenario variables of ../slh.gpr
+--  (SLH_BUILD_MODE, SLH_RUNTIME_CHECKS and SLH_CONTRACTS), and
+--  SLH_BENCH_VARIANT names the executable. See "make bench" in Makefile.
+with "../slh.gpr";
+project TBench is
+
+   for Languages use ("Ada", "C");
+   for Source_Dirs use (".", "../../hal");
+   for Source_Files use ("tbench.adb", "cycles.ads", "hal.c", "hal.h");
+   for Main use ("tbench.adb");
+   for Object_Dir use "bench/obj";
+   for Exec_Dir use "bench";
+
+   Variant := external ("SLH_BENCH_VARIANT", "default");
+
+   package Builder is
+      for Executable ("tbench.adb") use "tbench-" & Variant;
+   end Builder;
+
+   type Host_OS_Kind is ("Darwin", "Linux", "Windows", "generic");
+   Host_OS : Host_OS_Kind := external ("SLH_HOSTOS", "generic");
+
+   --  The cycle counter to use. See SLH/hal/README.md
+   Cycles_Switches := ();
+   case Host_OS is
+      when "Darwin" => Cycles_Switches := ("-DMAC_CYCLES");
+      when "Linux"  => Cycles_Switches := ("-DPERF_CYCLES");
+      when others   => null;
+   end case;
+
+   package Compiler is
+      for Default_Switches ("Ada") use ("-O2", "-gnatwa", "-gnatwe");
+      for Default_Switches ("C") use ("-O2") & Cycles_Switches;
+   end Compiler;
+
+end TBench;

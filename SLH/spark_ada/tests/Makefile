@@ -84,13 +84,83 @@ acvp_results.txt: tkats acvp_input.txt
 	@echo "--- Running tkats acvp ---"
 	./tkats acvp <acvp_input.txt >$@
 
-tkats: tkats.gpr tkats.adb ../src/*.ads ../src/*.adb
+#  gprbuild is always run, since make can't tell when CONTRACTS has
+#  changed. gprbuild only rebuilds what is out of date, but the tests
+#  are always re-run.
+tkats: FORCE
 	@echo "--- Building tkats ---"
 	gprbuild -s -Ptkats $(GPR_FLAGS)
 
+FORCE:
+
+#---------------------------------------------------------------------
+#  Benchmarks
+#
+#  "make bench" builds tbench (tbench.adb) for every build variant of
+#  the library, runs each one, and prints a summary of the median CPU
+#  cycles for SLH_Keygen, SLH_Sign and SLH_Verify. The variants are
+#  every combination of BENCH_MODES, BENCH_RUNTIME_CHECKS and
+#  BENCH_CONTRACTS below (the SLH_BUILD_MODE, SLH_RUNTIME_CHECKS and
+#  SLH_CONTRACTS variables of ../slh.gpr). The "profile" build mode is
+#  left out, since it is O2 with debug information.
+#
+#  BENCH_CONTRACTS is "disabled" by default. With contract checks, the
+#  postconditions recompute whole trees: at O2, one SLH_Keygen took
+#  about 90 s (against 0.06 s without), and one SLH_Sign more than 7
+#  minutes. To include them anyway, use for example
+#  make bench BENCH_CONTRACTS="enabled disabled" BENCH_ITER="1 1 1"
+#
+#  LibKeccak is always built optimized and without runtime checks, so
+#  only the SLH code differs between the variants.
+#
+#  The cycle counter is the one from mlkem-native, in ../../hal. On
+#  macOS it needs root, so each benchmark is run with $(BENCH_RUN),
+#  which is "sudo" there. sudo may ask for a password.
+#
+#  BENCH_ITER is the number of timed runs of keygen, sign and verify.
+#---------------------------------------------------------------------
+BENCH_MODES          ?= debug Og O1 O2 O3 Os
+BENCH_RUNTIME_CHECKS ?= enabled disabled
+BENCH_CONTRACTS      ?= disabled
+BENCH_ITER           ?= 10 10 50
+
+ifeq ($(HOSTOS),Darwin)
+BENCH_RUN ?= sudo
+else
+BENCH_RUN ?=
+endif
+
+KECCAK_FLAGS := -XLIBKECCAK_BUILD_MODE=optimize -XLIBKECCAK_RUNTIME_CHECKS=disabled
+
+BENCH_VARIANTS := $(foreach m,$(BENCH_MODES),$(foreach r,$(BENCH_RUNTIME_CHECKS),\
+                    $(foreach c,$(BENCH_CONTRACTS),$(m)-rtc_$(r)-contracts_$(c))))
+
+#  The variants share the library's object directory, so they are built
+#  one at a time, each into its own executable bench/tbench-VARIANT
+bench_build:
+	@for v in $(BENCH_VARIANTS); do \
+	  m=$${v%%-*}; rest=$${v#*-rtc_}; r=$${rest%%-*}; c=$${v##*-contracts_}; \
+	  echo "--- Building tbench-$$v ---"; \
+	  gprbuild -s -q -Ptbench -XSLH_HOSTOS=$(HOSTOS) -XSLH_BUILD_MODE=$$m \
+	    -XSLH_RUNTIME_CHECKS=$$r -XSLH_CONTRACTS=$$c -XSLH_BENCH_VARIANT=$$v \
+	    $(KECCAK_FLAGS) || exit 1; \
+	done
+
+bench_run: bench_build
+	@for v in $(BENCH_VARIANTS); do \
+	  echo "--- Running tbench-$$v ---"; \
+	  $(BENCH_RUN) ./bench/tbench-$$v $$v $(BENCH_ITER) >bench/$$v.txt || exit 1; \
+	done
+
+bench: bench_run bench_report.py
+	@echo "--- Benchmark summary ---"
+	@$(PYTHON) bench_report.py $(addprefix bench/,$(addsuffix .txt,$(BENCH_VARIANTS))) \
+	  | tee bench/summary.txt
+
 clean:
 	gprclean -r -Ptkats $(GPR_FLAGS)
+	rm -rf bench
 	rm -f hash_kats_results.txt wots_kats_results.txt xmss_kats_results.txt ht_kats_results.txt fors_kats_results.txt \
 	      slh_kats_results.txt acvp_input.txt acvp_results.txt
 
-.PHONY: all check check_hash check_wots check_xmss check_ht check_fors check_slh check_acvp clean
+.PHONY: FORCE all check check_hash check_wots check_xmss check_ht check_fors check_slh check_acvp bench bench_build bench_run clean

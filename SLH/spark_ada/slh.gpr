@@ -77,7 +77,7 @@ library project SLH is
    case Contracts_Checks is
       when "enabled" =>
          Contracts_Switches :=
-           ("-gnata", "-gnatVa"); --  Enable assertions and contracts
+           ("-gnata"); --  Enable assertions and contracts
       when "disabled" =>
          null;
    end case;
