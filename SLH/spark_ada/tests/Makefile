@@ -127,7 +127,7 @@ BENCH_ITER           ?= 10 10 50
 ifeq ($(HOSTOS),Darwin)
 BENCH_RUN ?= sudo
 else
-BENCH_RUN ?=
+BENCH_RUN ?= sudo # also required on Linux
 endif
 
 KECCAK_FLAGS := -XLIBKECCAK_BUILD_MODE=optimize -XLIBKECCAK_RUNTIME_CHECKS=disabled
