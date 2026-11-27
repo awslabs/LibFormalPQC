@@ -29,7 +29,7 @@ import sys
 from check_hash_kats import parse_records
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-ACVP_DIR = os.path.join(HERE, "..", "..", "acvp")
+ACVP_DIR = os.path.join(HERE, "..", "acvp")
 FILES = {
     "KeyGen": "SLH-DSA-keyGen-SHAKE-256s.json",
     "SigGen": "SLH-DSA-sigGen-SHAKE-256s.json",

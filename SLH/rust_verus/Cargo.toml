@@ -1,0 +1,41 @@
+[package]
+name = "slh_dsa"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+description = "SLH-DSA-SHAKE-256s (FIPS 205), verified with Verus"
+
+[dependencies]
+vstd = { version = "=0.0.0-2026-11-22-0344", default-features = false }
+sha3 = { version = "=0.11.0", default-features = false }
+
+[features]
+# Exposes the internal functions of FIPS 205 sections 4 to 9, for the
+# test programs. Not for use by applications.
+kat = []
+# Builds the cycle counter in SLH/hal/hal.c, for the benchmark program
+# (see build.rs).
+bench = []
+
+[package.metadata.verus]
+verify = true
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(verus_keep_ghost)', 'cfg(verus_only)'] }
+
+# The test programs. They use std, are not verified, and need the
+# internal functions, so they require the kat feature.
+[[example]]
+name = "tkats"
+required-features = ["kat"]
+
+[[example]]
+name = "bench"
+required-features = ["bench"]
+
+# The dependencies are always optimized and built without overflow
+# checks, so that only this crate differs between benchmark variants
+# (see "make bench").
+[profile.release.package."*"]
+opt-level = 3
+overflow-checks = false

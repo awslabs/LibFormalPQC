@@ -10,9 +10,11 @@ Each FILE is the output of one tbench run, with lines of the form
 
     BENCH LABEL OPERATION MEDIAN MIN ITER
 
-where LABEL is MODE-rtc_RUNTIME_CHECKS-contracts_CONTRACTS. Prints a
-table with one row per build variant, giving the median cycles for each
-operation, and how many times slower each variant is than the fastest.
+where LABEL is MODE-KEY_VALUE-KEY_VALUE..., for example
+O2-rtc_disabled-contracts_disabled for the SPARK benchmark or
+O3-overflow_enabled for the Rust one. Prints a table with one row per
+build variant, giving the median cycles for each operation, and how many
+times slower each variant is than the fastest.
 
 Exits with status 1 if any file has no results.
 """
@@ -20,7 +22,16 @@ Exits with status 1 if any file has no results.
 import sys
 
 OPERATIONS = ["Keygen", "Sign", "Verify"]
-MODES = ["debug", "Og", "O1", "O2", "O3", "Os"]
+MODES = ["debug", "Og", "O0", "O1", "O2", "O3", "Os", "Oz"]
+
+#  Column headings for the KEY parts of labels
+HEADINGS = {"rtc": "Runtime", "contracts": "Contracts", "overflow": "Overflow"}
+
+
+def split_label(label):
+    """Return (mode, [(key, value), ...]) for a label"""
+    parts = label.split("-")
+    return parts[0], [tuple(p.split("_", 1)) if "_" in p else (p, "") for p in parts[1:]]
 
 
 def parse(path):
@@ -36,8 +47,8 @@ def parse(path):
 
 
 def sort_key(label):
-    mode, rtc, contracts = label.split("-")
-    return (MODES.index(mode) if mode in MODES else len(MODES), rtc, contracts)
+    mode, rest = split_label(label)
+    return (MODES.index(mode) if mode in MODES else len(MODES), mode, rest)
 
 
 def main():
@@ -64,14 +75,15 @@ def main():
     print("Iterations: " + ", ".join(f"{op} {iters[op][2]}" for op in OPERATIONS))
     print("(x N.NN is the slowdown relative to the fastest variant)")
     print()
-    header = f"{'Mode':6} {'Runtime':8} {'Contracts':9}"
+    keys = [k for k, _ in split_label(next(iter(rows)))[1]]
+    header = f"{'Mode':6}" + "".join(f" {HEADINGS.get(k, k):9}" for k in keys)
     for op in OPERATIONS:
         header += f" {op:>22}"
     print(header)
     print("-" * len(header))
     for label in sorted(rows, key=sort_key):
-        mode, rtc, contracts = label.split("-")
-        line = f"{mode:6} {rtc[4:]:8} {contracts[10:]:9}"
+        mode, rest = split_label(label)
+        line = f"{mode:6}" + "".join(f" {v:9}" for _, v in rest)
         for op in OPERATIONS:
             median = rows[label][op][0]
             line += f" {median:>14,} x{median / best[op]:5.2f}"

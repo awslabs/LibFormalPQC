@@ -17,7 +17,7 @@ with SLH;              use SLH;
 --
 --    BENCH LABEL OPERATION MEDIAN MIN ITER
 --
---  where MEDIAN and MIN are in cycles. tests/bench_report.py reads
+--  where MEDIAN and MIN are in cycles. SLH/checkers/bench_report.py reads
 --  these lines. Every signature is checked with SLH_Verify, outside the
 --  timed region, so a broken build can't produce results.
 --

@@ -118,7 +118,8 @@ the contracts and theorems are strong enough to detect errors.
 The tests in `tests` check the code against:
 
 * Python reference models of FIPS 205 sections 4 to 9, in
-`tests/check_*_kats.py`. Each model follows the FIPS 205 pseudo-code
+`SLH/checkers/check_*_kats.py`, which are shared by all the
+implementations of SLH-DSA in this repository. Each model follows the FIPS 205 pseudo-code
 closely, including its in-place updates of ADRS, so it is independent
 of the SPARK code. The section 4.1 checker uses Python's `hashlib`.
 
@@ -221,7 +222,7 @@ All FORS KATs passed
 ...
 All SLH-DSA KATs passed
 --- Checking NIST ACVP tests ---
-python3 check_acvp.py check acvp_results.txt
+python3 ../../checkers/check_acvp.py check acvp_results.txt
 ACVP KeyGen         10 passed
 ACVP SigGen         14 passed
 ACVP SigGenPure     14 passed
@@ -237,7 +238,7 @@ starting `FAIL` for each test that fails.
 
 Each group can also be run on its own:
 
-| Target | Tests | Checked by |
+| Target | Tests | Checked by (in `SLH/checkers`) |
 |--------|-------|------------|
 | `make check_hash` | Section 4.1 hash functions | `check_hash_kats.py` |
 | `make check_wots` | Section 5, WOTS+ | `check_wots_kats.py` |

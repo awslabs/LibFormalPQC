@@ -4,6 +4,10 @@
 HOSTOS := $(shell uname -s)
 PYTHON ?= python3
 
+#  The Python checkers, shared by all implementations of SLH-DSA
+#  in this repository
+CHECKERS := ../../checkers
+
 #  CONTRACTS=disabled (the default) builds the library without runtime
 #  checks of contracts and assertions. Runtime checks (ranges, overflow,
 #  indexing) are still enabled. gnatprove proves all the contracts, and
@@ -23,35 +27,35 @@ all: check
 
 check: check_hash check_wots check_xmss check_ht check_fors check_slh check_acvp
 
-check_hash: hash_kats_results.txt check_hash_kats.py
+check_hash: hash_kats_results.txt $(CHECKERS)/check_hash_kats.py
 	@echo "--- Checking hash function KATs against Python hashlib ---"
-	$(PYTHON) check_hash_kats.py hash_kats_results.txt
+	$(PYTHON) $(CHECKERS)/check_hash_kats.py hash_kats_results.txt
 
-check_wots: wots_kats_results.txt check_wots_kats.py check_hash_kats.py
+check_wots: wots_kats_results.txt $(CHECKERS)/check_wots_kats.py $(CHECKERS)/check_hash_kats.py
 	@echo "--- Checking WOTS+ KATs against the Python reference model ---"
-	$(PYTHON) check_wots_kats.py wots_kats_results.txt
+	$(PYTHON) $(CHECKERS)/check_wots_kats.py wots_kats_results.txt
 
-check_xmss: xmss_kats_results.txt check_xmss_kats.py check_wots_kats.py check_hash_kats.py
+check_xmss: xmss_kats_results.txt $(CHECKERS)/check_xmss_kats.py $(CHECKERS)/check_wots_kats.py $(CHECKERS)/check_hash_kats.py
 	@echo "--- Checking XMSS KATs against the Python reference model ---"
-	$(PYTHON) check_xmss_kats.py xmss_kats_results.txt
+	$(PYTHON) $(CHECKERS)/check_xmss_kats.py xmss_kats_results.txt
 
-check_ht: ht_kats_results.txt check_ht_kats.py check_xmss_kats.py check_wots_kats.py check_hash_kats.py
+check_ht: ht_kats_results.txt $(CHECKERS)/check_ht_kats.py $(CHECKERS)/check_xmss_kats.py $(CHECKERS)/check_wots_kats.py $(CHECKERS)/check_hash_kats.py
 	@echo "--- Checking hypertree KATs against the Python reference model ---"
-	$(PYTHON) check_ht_kats.py ht_kats_results.txt
+	$(PYTHON) $(CHECKERS)/check_ht_kats.py ht_kats_results.txt
 
-check_fors: fors_kats_results.txt check_fors_kats.py check_xmss_kats.py check_wots_kats.py check_hash_kats.py
+check_fors: fors_kats_results.txt $(CHECKERS)/check_fors_kats.py $(CHECKERS)/check_xmss_kats.py $(CHECKERS)/check_wots_kats.py $(CHECKERS)/check_hash_kats.py
 	@echo "--- Checking FORS KATs against the Python reference model ---"
-	$(PYTHON) check_fors_kats.py fors_kats_results.txt
+	$(PYTHON) $(CHECKERS)/check_fors_kats.py fors_kats_results.txt
 
-check_slh: slh_kats_results.txt check_slh_kats.py check_fors_kats.py check_ht_kats.py check_xmss_kats.py check_wots_kats.py check_hash_kats.py
+check_slh: slh_kats_results.txt $(CHECKERS)/check_slh_kats.py $(CHECKERS)/check_fors_kats.py $(CHECKERS)/check_ht_kats.py $(CHECKERS)/check_xmss_kats.py $(CHECKERS)/check_wots_kats.py $(CHECKERS)/check_hash_kats.py
 	@echo "--- Checking SLH-DSA KATs against the Python reference model ---"
-	$(PYTHON) check_slh_kats.py slh_kats_results.txt
+	$(PYTHON) $(CHECKERS)/check_slh_kats.py slh_kats_results.txt
 
 #  NIST ACVP test vectors, from ../../acvp/*.json (shared by all
 #  implementations of SLH-DSA in this repository)
-check_acvp: acvp_results.txt check_acvp.py
+check_acvp: acvp_results.txt $(CHECKERS)/check_acvp.py
 	@echo "--- Checking NIST ACVP tests ---"
-	$(PYTHON) check_acvp.py check acvp_results.txt
+	$(PYTHON) $(CHECKERS)/check_acvp.py check acvp_results.txt
 
 hash_kats_results.txt: tkats
 	@echo "--- Running tkats hash ---"
@@ -77,8 +81,8 @@ slh_kats_results.txt: tkats
 	@echo "--- Running tkats slh ---"
 	./tkats slh >$@
 
-acvp_input.txt: check_acvp.py ../../acvp/*.json
-	$(PYTHON) check_acvp.py input $@
+acvp_input.txt: $(CHECKERS)/check_acvp.py ../../acvp/*.json
+	$(PYTHON) $(CHECKERS)/check_acvp.py input $@
 
 acvp_results.txt: tkats acvp_input.txt
 	@echo "--- Running tkats acvp ---"
@@ -152,9 +156,9 @@ bench_run: bench_build
 	  $(BENCH_RUN) ./bench/tbench-$$v $$v $(BENCH_ITER) >bench/$$v.txt || exit 1; \
 	done
 
-bench: bench_run bench_report.py
+bench: bench_run $(CHECKERS)/bench_report.py
 	@echo "--- Benchmark summary ---"
-	@$(PYTHON) bench_report.py $(addprefix bench/,$(addsuffix .txt,$(BENCH_VARIANTS))) \
+	@$(PYTHON) $(CHECKERS)/bench_report.py $(addprefix bench/,$(addsuffix .txt,$(BENCH_VARIANTS))) \
 	  | tee bench/summary.txt
 
 clean:
