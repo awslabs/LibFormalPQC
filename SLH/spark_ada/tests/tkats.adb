@@ -39,7 +39,8 @@ begin
    elsif Argument_Count = 1 and then Argument (1) = "acvp" then
       SLH.KAT.ACVP_Tests;
    else
-      Put_Line (Standard_Error, "usage: tkats hash|wots|xmss|ht|fors|slh|acvp");
+      Put_Line (Standard_Error,
+                "usage: tkats hash|wots|xmss|ht|fors|slh|acvp");
       Set_Exit_Status (Failure);
    end if;
 end TKATs;
