@@ -4,7 +4,8 @@
 
 """Run the NIST ACVP test vectors for SLH-DSA-SHAKE-256s through 'tkats acvp'.
 
-The vectors in acvp/ are from the NIST ACVP server
+The vectors in SLH/acvp/ (shared by all the implementations of
+SLH-DSA in this repository) are from the NIST ACVP server
 (https://github.com/usnistgov/ACVP-Server, gen-val/json-files/
 SLH-DSA-{keyGen,sigGen,sigVer}-FIPS205/internalProjection.json),
 filtered to the SLH-DSA-SHAKE-256s parameter set and, for the pre-hash
@@ -28,6 +29,7 @@ import sys
 from check_hash_kats import parse_records
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+ACVP_DIR = os.path.join(HERE, "..", "..", "acvp")
 FILES = {
     "KeyGen": "SLH-DSA-keyGen-SHAKE-256s.json",
     "SigGen": "SLH-DSA-sigGen-SHAKE-256s.json",
@@ -45,7 +47,7 @@ def function_name(mode, group):
 def load_tests():
     """Yield (function, test group, test) for every test case"""
     for mode, name in FILES.items():
-        with open(os.path.join(HERE, "acvp", name), encoding="ascii") as fd:
+        with open(os.path.join(ACVP_DIR, name), encoding="ascii") as fd:
             data = json.load(fd)
         for group in data["testGroups"]:
             assert group["parameterSet"] == "SLH-DSA-SHAKE-256s"

@@ -122,7 +122,7 @@ The tests in `tests` check the code against:
 closely, including its in-place updates of ADRS, so it is independent
 of the SPARK code. The section 4.1 checker uses Python's `hashlib`.
 
-* The NIST ACVP test vectors for SLH-DSA-SHAKE-256s, in `tests/acvp`,
+* The NIST ACVP test vectors for SLH-DSA-SHAKE-256s, in `../acvp`,
 covering key generation, signing and verification, through both the
 internal interface (section 9) and the application interface (section 10),
 with pure and pre-hash signing, and contexts of up to 255 bytes. The
@@ -270,12 +270,13 @@ ACVP test cases from standard input.
 
 ### The ACVP test vectors
 
-The files in `tests/acvp` come from the NIST
+The files in `SLH/acvp` come from the NIST
 [ACVP server repository](https://github.com/usnistgov/ACVP-Server), in
 `gen-val/json-files/SLH-DSA-keyGen-FIPS205`, `SLH-DSA-sigGen-FIPS205` and
 `SLH-DSA-sigVer-FIPS205`, file `internalProjection.json`. Each file is
 filtered to the SLH-DSA-SHAKE-256s parameter set, and its pre-hash tests
-are filtered to SHA3-512 and SHAKE-256. `check_acvp.py input` converts
+are filtered to SHA3-512 and SHAKE-256. The directory is shared by all
+the implementations of SLH-DSA in this repository. `check_acvp.py input` converts
 them to the input format of `tkats acvp`, and `check_acvp.py check`
 checks the results.
 

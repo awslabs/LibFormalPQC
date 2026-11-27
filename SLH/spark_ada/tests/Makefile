@@ -47,7 +47,8 @@ check_slh: slh_kats_results.txt check_slh_kats.py check_fors_kats.py check_ht_ka
 	@echo "--- Checking SLH-DSA KATs against the Python reference model ---"
 	$(PYTHON) check_slh_kats.py slh_kats_results.txt
 
-#  NIST ACVP test vectors, from acvp/*.json
+#  NIST ACVP test vectors, from ../../acvp/*.json (shared by all
+#  implementations of SLH-DSA in this repository)
 check_acvp: acvp_results.txt check_acvp.py
 	@echo "--- Checking NIST ACVP tests ---"
 	$(PYTHON) check_acvp.py check acvp_results.txt
@@ -76,7 +77,7 @@ slh_kats_results.txt: tkats
 	@echo "--- Running tkats slh ---"
 	./tkats slh >$@
 
-acvp_input.txt: check_acvp.py acvp/*.json
+acvp_input.txt: check_acvp.py ../../acvp/*.json
 	$(PYTHON) check_acvp.py input $@
 
 acvp_results.txt: tkats acvp_input.txt
